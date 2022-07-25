@@ -376,7 +376,7 @@ export const init = async () => {
       }
     }
     if (runningGame === false) {
-      font.draw(batch, "F5 TO TRY AGAIN", 260, 450, 250);
+      font.draw(batch, "F5 TO TRY AGAIN", 240, 450, 250);
     }
 
     //bg
