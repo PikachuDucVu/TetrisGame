@@ -173,8 +173,8 @@ export const init2 = async () => {
       batch,
       characterPosition.x - 50,
       characterPosition.y - 20,
-      20,
-      20
+      50,
+      50
     );
     batch.end();
 

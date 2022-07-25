@@ -13,7 +13,7 @@ import {
   Animation,
   PlayMode,
 } from "gdxts";
-// import { init2 } from "./PokemonGame";
+import { init2 } from "./PokemonGame"; // pokemon
 export const init = async () => {
   const stage = createStage();
   const canvas = stage.getCanvas();
