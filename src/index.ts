@@ -45,8 +45,8 @@ export const init = async () => {
 
   gl.clearColor(0, 0, 0, 1);
   let lastClick = false;
-  let speedGame = 185;
-  let obstacleSpeed = speedGame;
+  let speedY = 200;
+  let obstacleSpeed = speedY;
   let count = 0;
   let heightObstacleUp1 = 300;
   let heightObstacleDown1 = 270;
@@ -61,7 +61,7 @@ export const init = async () => {
     firstClick = true;
 
     if (firstClick === true && runningGame === true) {
-      speedGame = 185;
+      speedY = 200;
       count = 0;
       rotationOfBird = -0.1;
     }
@@ -72,8 +72,8 @@ export const init = async () => {
   function moveOfBird(delta: number) {
     if (lastClick) {
       lastClick = true;
-      characterPosition.y = characterPosition.y + (speedGame *= 1.03) * delta;
-      count += speedGame * delta;
+      characterPosition.y = characterPosition.y + (speedY *= 1.03) * delta;
+      count += speedY * delta;
       if (rotationOfBird <= 0.25) {
         setTimeout(() => {
           rotationOfBird += 0.05;
@@ -81,16 +81,16 @@ export const init = async () => {
         }, 50);
       }
 
-      if (count >= 80) {
+      if (count >= 85) {
         lastClick = false;
         count--;
       }
     }
 
     if (lastClick === false) {
-      characterPosition.y -= speedGame * delta;
-      if (count >= -30 && count < 80) {
-        count -= (speedGame *= 1.025) * delta;
+      characterPosition.y -= speedY * delta;
+      if (count >= -30 && count < 85) {
+        count -= (speedY *= 1.035) * delta;
       }
       if (rotationOfBird >= -1) {
         rotationOfBird -= 0.07;
@@ -200,7 +200,7 @@ export const init = async () => {
       frame %= 3;
     }
 
-    // console.log(characterPosition.y, speedGame);
+    // console.log(characterPosition.y, speedY);
     if (firstClick === true && runningGame === true) {
       moveOfBird(delta);
       obstacleMove(delta);
@@ -269,7 +269,7 @@ export const init = async () => {
       runningGame = false;
       firstClick = false;
       lastClick = false;
-      speedGame = 0;
+      speedY = 0;
       batch.draw(gameovericon, 50, 500, 500, 250);
     }
 
@@ -280,7 +280,7 @@ export const init = async () => {
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
 
       // crash with obstacleUp
@@ -290,35 +290,35 @@ export const init = async () => {
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
       if (heightObstacleUp1 === 400 && characterPosition.y >= 560) {
         batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
       if (heightObstacleUp1 === 300 && characterPosition.y >= 660) {
         batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
       if (heightObstacleUp1 === 200 && characterPosition.y >= 760) {
         batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
       if (heightObstacleUp1 === 125 && characterPosition.y >= 830) {
         batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
     }
 
@@ -328,7 +328,7 @@ export const init = async () => {
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
 
       if (heightObstacleUp2 === 350 && characterPosition.y >= 610) {
@@ -336,7 +336,7 @@ export const init = async () => {
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
 
       if (heightObstacleUp2 === 500 && characterPosition.y >= 460) {
@@ -344,35 +344,35 @@ export const init = async () => {
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
       if (heightObstacleUp2 === 400 && characterPosition.y >= 560) {
         batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
       if (heightObstacleUp2 === 300 && characterPosition.y >= 660) {
         batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0; // correct
+        speedY = 0; // correct
       }
       if (heightObstacleUp2 === 200 && characterPosition.y >= 760) {
         batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
       if (heightObstacleUp2 === 125 && characterPosition.y >= 830) {
         batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
         lastClick = false;
-        speedGame = 0;
+        speedY = 0;
       }
     }
     if (runningGame === false) {
