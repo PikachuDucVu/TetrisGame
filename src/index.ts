@@ -72,7 +72,7 @@ export const init = async () => {
   function moveOfBird(delta: number) {
     if (lastClick) {
       lastClick = true;
-      characterPosition.y = characterPosition.y + (speedGame *= 1.02) * delta;
+      characterPosition.y = characterPosition.y + (speedGame *= 1.03) * delta;
       count += speedGame * delta;
       if (rotationOfBird <= 0.25) {
         setTimeout(() => {
@@ -376,15 +376,15 @@ export const init = async () => {
       }
     }
     if (runningGame === false) {
-      font.draw(batch, "F5 TO TRY AGAIN", 220, 450, 250);
+      font.draw(batch, "F5 TO TRYAGAIN", 220, 450, 250);
     }
 
     //bg
     if (layer1 <= -595) {
-      layer1 = 594;
+      layer1 = 593;
     }
     if (layer2 <= -595) {
-      layer2 = 594;
+      layer2 = 593;
     }
 
     batch.end();
