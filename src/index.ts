@@ -376,7 +376,7 @@ export const init = async () => {
       }
     }
     if (runningGame === false) {
-      font.draw(batch, "Ga", 260, 450, 250);
+      font.draw(batch, "NON", 260, 450, 250);
     }
 
     //bg
