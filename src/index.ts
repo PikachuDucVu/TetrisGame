@@ -120,9 +120,9 @@ export const init = async () => {
 
     if (falling === true) {
       characterPosition.y -= gravityGame * delta;
-      if (rotationOfBird >= -1.1) {
+      if (rotationOfBird >= -1.05) {
         setTimeout(() => {
-          rotationOfBird -= 0.15 - delta;
+          rotationOfBird -= 0.1 - delta;
         }, 25);
       }
     }
