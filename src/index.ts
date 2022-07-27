@@ -67,10 +67,10 @@ export const init = async () => {
   inputHandler.addEventListener(InputEvent.TouchStart, (x, y) => {
     firstClick = true;
     if (firstClick === true && runningGame === true) {
-      speedY = 520;
+      speedY = 525;
       rotationOfBird = 0;
       gravityOfBird = 0;
-      gravityGame = 230;
+      gravityGame = 170;
     }
     falling = false;
 
@@ -232,10 +232,10 @@ export const init = async () => {
     shapeRenderer.rect(true, 0, 0, 600, 1000);
     shapeRenderer.end();
 
-    frame += delta;
+    frame += delta * 2;
     gravityOfBird += delta;
     speedY = speedY - 20 - gravityOfBird;
-    gravityGame += 250 * delta;
+    gravityGame += 250 * delta * 1.75;
 
     if (firstClick === true && runningGame === true) {
       spawnAndMovePipe(delta);
@@ -402,7 +402,7 @@ export const init = async () => {
         tryagainmode = true;
       }, 800);
     }
-    console.log(runningGame, tryagainmode);
+
     batch.end();
   });
 };
