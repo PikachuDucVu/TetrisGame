@@ -13,16 +13,6 @@ import {
   Animation,
   PlayMode,
 } from "gdxts";
-/*
-1. draw bird  
-2. draw pipe
-3. spawn pipe
-4. move pipe
-5. apply gravity to bird
-6. move bird (check inputHandler, apply speedY to bird, rotate bird)
-7. check collision (check win condition)
-8. try again
-*/
 
 export const init = async () => {
   const stage = createStage();
@@ -60,8 +50,8 @@ export const init = async () => {
   let obstacleSpeed = 400;
   let heightObstacleUp1 = 300;
   let heightObstacleDown1 = 270;
-  let heightObstacleUp2 = 350;
-  let heightObstacleDown2 = 220;
+  let heightObstacleUp2 = 200;
+  let heightObstacleDown2 = 420;
 
   //config game
   let speedY = 0;
@@ -315,7 +305,7 @@ export const init = async () => {
       rotationOfBird
     );
 
-    //gameover
+    //gameover condition
     if (firstClick === false && runningGame === true) {
       batch.draw(tapToPlay, 180, 330, 200, 200);
     }
@@ -368,13 +358,7 @@ export const init = async () => {
         firstClick = false;
         speedY = 0;
       }
-      // crash with obstacleUp
       if (heightObstacleUp2 === 300 && characterPosition.y >= 660) {
-        runningGame = false;
-        firstClick = false;
-        speedY = 0;
-      }
-      if (heightObstacleUp2 === 350 && characterPosition.y >= 610) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
@@ -399,6 +383,7 @@ export const init = async () => {
         firstClick = false;
         speedY = 0;
       }
+      // crash with obstacleUp
     }
     if (runningGame === false) {
       batch.draw(gameovericon, 50, 500, 500, 250);
