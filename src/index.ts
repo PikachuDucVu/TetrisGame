@@ -47,7 +47,7 @@ export const init = async () => {
 
   //config obstacle
   let obstaclePosition = [495, 195, 995, 195];
-  let obstacleSpeed = 400;
+  let obstacleSpeed = 350;
   let heightObstacleUp1 = 300;
   let heightObstacleDown1 = 270;
   let heightObstacleUp2 = 200;
@@ -393,7 +393,7 @@ export const init = async () => {
         characterPosition.y -= gravityGame * delta;
       }
       font.draw(batch, "TAP TO TRY AGAIN", 150, 500, 400);
-      font.draw(batch, "Your Score is: " + score, 170, 450, 400);
+      font.draw(batch, "Your Score is: " + score, 170, 760, 400);
       if (rotationOfBird >= -1.2) {
         rotationOfBird -= 0.1 - delta;
       }
