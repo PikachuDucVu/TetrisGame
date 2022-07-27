@@ -70,7 +70,7 @@ export const init = async () => {
       speedY = 520;
       rotationOfBird = 0;
       gravityOfBird = 0;
-      gravityGame = 200;
+      gravityGame = 230;
     }
     falling = false;
 
@@ -245,6 +245,7 @@ export const init = async () => {
     // draw background
     batch.setProjection(camera.projectionView.values);
     batch.begin();
+    batch.draw(background1, 0, 0, 600, 1000);
     batch.draw(background2, layerbg2, 0, 600, 1000);
     batch.draw(background1, layerbg1, 0, 600, 1000);
     if (layerbg1 <= -595) {
