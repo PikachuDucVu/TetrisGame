@@ -56,7 +56,7 @@ export const init = async () => {
   //config game
   let speedY = 0;
   let gravityOfBird = 0;
-  let gravityGame = 0;
+  let fallSpeed = 0;
   let tryagainmode = false;
   let score = 0;
 
@@ -70,7 +70,7 @@ export const init = async () => {
       speedY = 525;
       rotationOfBird = 0;
       gravityOfBird = 0;
-      gravityGame = 170;
+      fallSpeed = 200;
     }
     falling = false;
 
@@ -89,7 +89,7 @@ export const init = async () => {
 
       speedY = 0;
       gravityOfBird = 0;
-      gravityGame = 0;
+      fallSpeed = 0;
       score = 0;
 
       obstaclePosition = [495, 195, 995, 195];
@@ -121,11 +121,11 @@ export const init = async () => {
     }
 
     if (falling === true) {
-      characterPosition.y -= gravityGame * delta;
+      characterPosition.y -= fallSpeed * delta;
       if (rotationOfBird >= -1.05) {
         setTimeout(() => {
-          rotationOfBird -= 0.1 - delta;
-        }, 25);
+          rotationOfBird -= 0.07 - delta;
+        }, 50);
       }
     }
   }
@@ -235,7 +235,7 @@ export const init = async () => {
     frame += delta * 2;
     gravityOfBird += delta;
     speedY = speedY - 20 - gravityOfBird;
-    gravityGame += 250 * delta * 1.75;
+    fallSpeed += 250 * delta * 1.75;
 
     if (firstClick === true && runningGame === true) {
       spawnAndMovePipe(delta);
@@ -391,7 +391,7 @@ export const init = async () => {
     if (runningGame === false) {
       batch.draw(gameovericon, 50, 500, 500, 250);
       if (characterPosition.y >= 190) {
-        characterPosition.y -= gravityGame * delta;
+        characterPosition.y -= fallSpeed * delta;
       }
       font.draw(batch, "TAP TO TRY AGAIN", 150, 500, 400);
       font.draw(batch, "Your Score is: " + score, 170, 760, 400);
