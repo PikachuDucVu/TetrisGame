@@ -13,139 +13,179 @@ import {
   Animation,
   PlayMode,
 } from "gdxts";
+/*
+1. draw bird  
+2. draw pipe
+3. spawn pipe
+4. move pipe
+5. apply gravity to bird
+6. move bird (check inputHandler, apply speedY to bird, rotate bird)
+7. check collision (check win condition)
+8. try again
+*/
+
 export const init = async () => {
   const stage = createStage();
   const canvas = stage.getCanvas();
   const viewport = createViewport(canvas, 600, 1000);
   const gl = viewport.getContext();
-  const background1 = await Texture.load(gl, "./flappy-bird.gif");
-  let layer1 = 0;
-  const background2 = await Texture.load(gl, "./flappy-bird2.gif");
-  let layer2 = 595;
 
+  const background1 = await Texture.load(gl, "./flappy-bird.gif");
+  const background2 = await Texture.load(gl, "./flappy-bird2.gif");
   const obstacles = await Texture.load(gl, "./obstacle.webp");
   const gameovericon = await Texture.load(gl, "./gameover.png");
   const tapToPlay = await Texture.load(gl, "./taptoplay.png");
   const font = await BitmapFont.load(gl, "./font.fnt");
+  const newBird = await Texture.load(gl, "./newbird.png");
+  const regions = TextureRegion.splitTexture(newBird, 3, 1);
+  const birdAnimation = new Animation(regions.slice(0, 3), 0.25);
 
   const shapeRenderer = new ShapeRenderer(gl);
   const batch = new PolygonBatch(gl);
   const camera = viewport.getCamera();
   const inputHandler = new ViewportInputHandler(viewport);
 
-  const newBird = await Texture.load(gl, "./newbird.png");
-  const regions = TextureRegion.splitTexture(newBird, 3, 1);
-  const birdAnimation = new Animation(regions.slice(0, 3), 0.25);
-
+  //config of bỉd
   let characterPosition = new Vector2(250, 500);
   let rotationOfBird = 0;
-  let obstaclePosition1 = new Vector2(595, 195);
-  let obstaclePosition2 = new Vector2(995, 195);
+  let i = 0;
+  let frame = 0; // animation
 
-  gl.clearColor(0, 0, 0, 1);
-  let lastClick = false;
-  let speedY = 200;
-  let obstacleSpeed = speedY;
-  let count = 0;
+  let firstClick = false;
+  let falling = true;
+  let runningGame = true;
+
+  //config obstacle
+  let obstaclePosition = [495, 195, 995, 195];
+  let obstacleSpeed = 400;
   let heightObstacleUp1 = 300;
   let heightObstacleDown1 = 270;
   let heightObstacleUp2 = 350;
   let heightObstacleDown2 = 220;
-  let firstClick = false;
-  let runningGame = true;
-  let frame = 0;
-  let i = 0;
+
+  //config game
+  let speedY = 0;
+  let gravityOfBird = 0;
+  let gravityGame = 0;
+  let tryagainmode = false;
+
+  gl.clearColor(0, 0, 0, 1);
+  let layerbg2 = 595;
+  let layerbg1 = 0;
 
   inputHandler.addEventListener(InputEvent.TouchStart, (x, y) => {
     firstClick = true;
-
     if (firstClick === true && runningGame === true) {
-      speedY = 200;
-      count = 0;
-      rotationOfBird = -0.1;
+      speedY = 520;
+      rotationOfBird = 0;
+      gravityOfBird = 0;
+      gravityGame = 200;
     }
+    falling = false;
 
-    lastClick = true;
+    //try again
+    if (tryagainmode === true && runningGame === false) {
+      characterPosition = new Vector2(250, 500);
+
+      // redeclare
+
+      rotationOfBird = 0;
+      i = 0;
+      frame = 0;
+
+      layerbg2 = 595;
+      layerbg1 = 0;
+
+      speedY = 0;
+      gravityOfBird = 0;
+      gravityGame = 0;
+
+      obstaclePosition = [495, 195, 995, 195];
+      obstacleSpeed = 400;
+      heightObstacleUp1 = 300;
+      heightObstacleDown1 = 270;
+      heightObstacleUp2 = 350;
+      heightObstacleDown2 = 220;
+
+      firstClick = false;
+      falling = true;
+      runningGame = true;
+    }
   });
 
   function moveOfBird(delta: number) {
-    if (lastClick) {
-      lastClick = true;
-      characterPosition.y = characterPosition.y + (speedY *= 1.03) * delta;
-      count += speedY * delta;
-      if (rotationOfBird <= 0.25) {
+    if (falling === false) {
+      characterPosition.y = characterPosition.y + speedY * delta;
+      if (rotationOfBird <= 0.3) {
         setTimeout(() => {
-          rotationOfBird += 0.05;
+          rotationOfBird += 0.04;
           // console.log(rotationOfBird);
         }, 50);
       }
 
-      if (count >= 85) {
-        lastClick = false;
-        count--;
+      if (speedY <= 20) {
+        falling = true;
       }
     }
 
-    if (lastClick === false) {
-      characterPosition.y -= speedY * delta;
-      if (count >= -30 && count < 85) {
-        count -= (speedY *= 1.035) * delta;
-      }
-      if (rotationOfBird >= -1) {
-        rotationOfBird -= 0.07;
+    if (falling === true) {
+      characterPosition.y -= gravityGame * delta;
+      if (rotationOfBird >= -1.1) {
+        setTimeout(() => {
+          rotationOfBird -= 0.15 - delta;
+        }, 25);
       }
     }
   }
 
-  function getRandomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
+  function spawnAndMovePipe(delta: number) {
+    obstaclePosition[0] -= obstacleSpeed * delta;
+    obstaclePosition[2] -= obstacleSpeed * delta;
 
-  function obstacleMove(delta: number) {
-    obstaclePosition1.x -= obstacleSpeed * delta;
-    obstaclePosition2.x -= obstacleSpeed * delta;
-    layer1 -= delta * obstacleSpeed;
-    layer2 -= delta * obstacleSpeed;
+    //bg move
+    layerbg1 -= delta * obstacleSpeed;
+    layerbg2 -= delta * obstacleSpeed;
 
-    if (obstaclePosition1.x < -200) {
-      obstaclePosition1.set(695, 195);
+    // respawn pipe
+    if (obstaclePosition[0] < -200) {
+      obstaclePosition[0] = 695;
       randomHeightOfObstacle();
-      // heightObstacleUp1 = getRandomInt(200, 800);
-      // heightObstacleDown1 = getRandomInt(200, 800);
+
+      if (obstacleSpeed <= 520) {
+        obstacleSpeed *= 1.02;
+      }
+    }
+    if (obstaclePosition[2] < -200) {
+      obstaclePosition[2] = 695;
+      randomHeightOfObstacle();
 
       if (obstacleSpeed <= 500) {
         obstacleSpeed *= 1.02;
       }
     }
-    if (obstaclePosition2.x < -200) {
-      obstaclePosition2.set(695, 195);
-      randomHeightOfObstacle();
-      if (obstacleSpeed <= 500) {
-        obstacleSpeed *= 1.02;
-      }
-    }
   }
 
+  //random height of obstacle
   function randomHeightOfObstacle() {
-    if (obstaclePosition1.x >= 600) {
+    if (obstaclePosition[0] >= 600) {
       let optionOfObstacle1 = getRandomInt(1, 5);
       switch (optionOfObstacle1) {
         case 1:
           heightObstacleDown1 = 150;
-          heightObstacleUp1 = 500; //
+          heightObstacleUp1 = 450; //
           break;
 
         case 2:
           heightObstacleDown1 = 250;
-          heightObstacleUp1 = 400;
+          heightObstacleUp1 = 350;
           break;
         case 3:
           heightObstacleDown1 = 350;
-          heightObstacleUp1 = 300;
+          heightObstacleUp1 = 250;
           break;
         case 4:
           heightObstacleDown1 = 450;
-          heightObstacleUp1 = 200;
+          heightObstacleUp1 = 150;
           break;
         case 5:
           heightObstacleDown1 = 550;
@@ -156,25 +196,25 @@ export const init = async () => {
       }
     }
 
-    if (obstaclePosition2.x >= 600) {
+    if (obstaclePosition[2] >= 600) {
       let optionOfObstacle2 = getRandomInt(1, 5);
       switch (optionOfObstacle2) {
         case 1:
           heightObstacleDown2 = 150;
-          heightObstacleUp2 = 500;
+          heightObstacleUp2 = 450;
           break;
 
         case 2:
           heightObstacleDown2 = 250;
-          heightObstacleUp2 = 400;
+          heightObstacleUp2 = 350;
           break;
         case 3:
           heightObstacleDown2 = 350;
-          heightObstacleUp2 = 300;
+          heightObstacleUp2 = 250;
           break;
         case 4:
           heightObstacleDown2 = 450;
-          heightObstacleUp2 = 200;
+          heightObstacleUp2 = 150;
           break;
         case 5:
           heightObstacleDown2 = 550;
@@ -185,6 +225,11 @@ export const init = async () => {
       }
     }
   }
+  function getRandomInt(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  // try again
 
   createGameLoop((delta: number) => {
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -192,25 +237,71 @@ export const init = async () => {
     shapeRenderer.begin();
     shapeRenderer.rect(true, 0, 0, 600, 1000);
     shapeRenderer.end();
+
     frame += delta;
+    gravityOfBird += delta;
+    speedY = speedY - 20 - gravityOfBird;
+    gravityGame += 250 * delta;
+
+    if (firstClick === true && runningGame === true) {
+      spawnAndMovePipe(delta);
+      moveOfBird(delta);
+    }
+
+    // draw background
+    batch.setProjection(camera.projectionView.values);
+    batch.begin();
+    batch.draw(background2, layerbg2, 0, 600, 1000);
+    batch.draw(background1, layerbg1, 0, 600, 1000);
+    if (layerbg1 <= -595) {
+      layerbg1 = 590;
+    }
+    if (layerbg2 <= -595) {
+      layerbg2 = 590;
+    }
+
+    //draw obstacle
+    batch.draw(
+      obstacles,
+      obstaclePosition[0] - 50,
+      obstaclePosition[1],
+      150,
+      heightObstacleDown1 // heightDown // default = 270 // max 500 min 150
+    );
+    batch.draw(
+      obstacles,
+      obstaclePosition[0] - 50,
+      obstaclePosition[1] + 610,
+      150,
+      heightObstacleUp1, // heightUp // default = 300 // max 500 min 150
+      75,
+      100,
+      47.13
+    );
+    batch.draw(
+      obstacles,
+      obstaclePosition[2] - 50,
+      obstaclePosition[3],
+      150,
+      heightObstacleDown2 // heightDown // default = 270 // max 500 min 150
+    );
+    batch.draw(
+      obstacles,
+      obstaclePosition[2] - 50,
+      obstaclePosition[3] + 610,
+      150,
+      heightObstacleUp2, // heightUp // default = 300 // max 500 min 150
+      75,
+      100,
+      47.13
+    );
+
+    //draw chim
     let region = birdAnimation.getKeyFrame(frame, PlayMode.LOOP);
     if (i > 0.2) {
       i = 0;
       frame %= 3;
     }
-
-    // console.log(characterPosition.y, speedY);
-    if (firstClick === true && runningGame === true) {
-      moveOfBird(delta);
-      obstacleMove(delta);
-    }
-    // console.log(layer1);
-
-    batch.setProjection(camera.projectionView.values);
-    batch.begin();
-    batch.draw(background2, layer2, 0, 600, 1000);
-    batch.draw(background1, layer1, 0, 600, 1000);
-
     region.draw(
       batch,
       characterPosition.x,
@@ -222,44 +313,7 @@ export const init = async () => {
       rotationOfBird
     );
 
-    // obstacle 1
-    batch.draw(
-      obstacles,
-      obstaclePosition1.x - 50,
-      obstaclePosition1.y,
-      150,
-      heightObstacleDown1 // heightDown // default = 270 // max 500 min 150
-    );
-    batch.draw(
-      obstacles,
-      obstaclePosition1.x - 50,
-      obstaclePosition1.y + 610,
-      150,
-      heightObstacleUp1, // heightUp // default = 300 // max 500 min 150
-      75,
-      100,
-      47.13
-    );
-
-    // obstacles 2
-    batch.draw(
-      obstacles,
-      obstaclePosition2.x - 50,
-      obstaclePosition2.y,
-      150,
-      heightObstacleDown2 // height ben duoi default = 270 // max 500 min 150
-    );
-    batch.draw(
-      obstacles,
-      obstaclePosition2.x - 50,
-      obstaclePosition2.y + 610,
-      150,
-      heightObstacleUp2, // height ben tren // default = 300 // max 500 min 150
-      75,
-      100,
-      47.13
-    );
-
+    //gameover
     if (firstClick === false && runningGame === true) {
       batch.draw(tapToPlay, 180, 330, 200, 200);
     }
@@ -267,125 +321,100 @@ export const init = async () => {
     if (characterPosition.y <= 190) {
       runningGame = false;
       firstClick = false;
-      lastClick = false;
+      falling = false;
       speedY = 0;
-      batch.draw(gameovericon, 50, 500, 500, 250);
     }
 
-    if (Math.abs(characterPosition.x - obstaclePosition1.x) <= 90) {
+    if (Math.abs(characterPosition.x - obstaclePosition[0]) <= 90) {
       // crash with obstacleDown
       if (characterPosition.y - 90 - heightObstacleDown1 <= 90) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
-
       // crash with obstacleUp
-
-      if (heightObstacleUp1 === 500 && characterPosition.y >= 460) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
-        runningGame = false;
-        firstClick = false;
-        lastClick = false;
-        speedY = 0;
-      }
-      if (heightObstacleUp1 === 400 && characterPosition.y >= 560) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
-        runningGame = false;
-        firstClick = false;
-        lastClick = false;
-        speedY = 0;
-      }
       if (heightObstacleUp1 === 300 && characterPosition.y >= 660) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
-      if (heightObstacleUp1 === 200 && characterPosition.y >= 760) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
+      if (heightObstacleUp1 === 450 && characterPosition.y >= 510) {
         runningGame = false;
         firstClick = false;
-        lastClick = false;
+        speedY = 0;
+      }
+      if (heightObstacleUp1 === 350 && characterPosition.y >= 610) {
+        runningGame = false;
+        firstClick = false;
+        speedY = 0;
+      }
+      if (heightObstacleUp1 === 250 && characterPosition.y >= 660) {
+        runningGame = false;
+        firstClick = false;
+        speedY = 0;
+      }
+      if (heightObstacleUp1 === 150 && characterPosition.y >= 810) {
+        runningGame = false;
+        firstClick = false;
         speedY = 0;
       }
       if (heightObstacleUp1 === 125 && characterPosition.y >= 830) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
     }
 
-    if (Math.abs(characterPosition.x - obstaclePosition2.x) <= 90) {
+    if (Math.abs(characterPosition.x - obstaclePosition[2]) <= 90) {
       if (characterPosition.y - 90 - heightObstacleDown2 <= 90) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
-
       if (heightObstacleUp2 === 350 && characterPosition.y >= 610) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
-
       if (heightObstacleUp2 === 500 && characterPosition.y >= 460) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
       if (heightObstacleUp2 === 400 && characterPosition.y >= 560) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
       if (heightObstacleUp2 === 300 && characterPosition.y >= 660) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0; // correct
       }
-      if (heightObstacleUp2 === 200 && characterPosition.y >= 760) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
+      if (heightObstacleUp2 === 250 && characterPosition.y >= 760) {
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
       if (heightObstacleUp2 === 125 && characterPosition.y >= 830) {
-        batch.draw(gameovericon, 50, 500, 500, 250);
         runningGame = false;
         firstClick = false;
-        lastClick = false;
         speedY = 0;
       }
     }
     if (runningGame === false) {
-      font.draw(batch, "F5 TO TRYAGAIN", 220, 450, 250);
-    }
+      batch.draw(gameovericon, 50, 500, 500, 250);
+      if (characterPosition.y >= 190) {
+        characterPosition.y -= gravityGame * delta;
+      }
+      font.draw(batch, "TAP TO TRY AGAIN", 150, 500, 400);
+      if (rotationOfBird >= -1.2) {
+        rotationOfBird -= 0.1 - delta;
+      }
 
-    //bg
-    if (layer1 <= -595) {
-      layer1 = 593;
+      tryagainmode = true;
+      console.log(tryagainmode);
     }
-    if (layer2 <= -595) {
-      layer2 = 593;
-    }
-
     batch.end();
   });
 };
