@@ -94,8 +94,8 @@ export const init = async () => {
       obstacleSpeed = 400;
       heightObstacleUp1 = 300;
       heightObstacleDown1 = 270;
-      heightObstacleUp2 = 350;
-      heightObstacleDown2 = 220;
+      heightObstacleUp2 = 200;
+      heightObstacleDown2 = 420;
 
       firstClick = false;
       falling = true;
@@ -319,7 +319,7 @@ export const init = async () => {
 
     if (Math.abs(characterPosition.x - obstaclePosition[0]) <= 90) {
       // crash with obstacleDown
-      if (characterPosition.y - 90 - heightObstacleDown1 <= 90) {
+      if (characterPosition.y - 100 - heightObstacleDown1 <= 90) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
@@ -352,7 +352,7 @@ export const init = async () => {
       }
     }
 
-    if (Math.abs(characterPosition.x - obstaclePosition[2]) <= 90) {
+    if (Math.abs(characterPosition.x - obstaclePosition[2]) <= 95) {
       if (characterPosition.y - 90 - heightObstacleDown1 <= 90) {
         runningGame = false;
         firstClick = false;
