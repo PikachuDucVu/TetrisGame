@@ -58,6 +58,7 @@ export const init = async () => {
   let gravityOfBird = 0;
   let gravityGame = 0;
   let tryagainmode = false;
+  let score = 0;
 
   gl.clearColor(0, 0, 0, 1);
   let layerbg2 = 595;
@@ -89,6 +90,7 @@ export const init = async () => {
       speedY = 0;
       gravityOfBird = 0;
       gravityGame = 0;
+      score = 0;
 
       obstaclePosition = [495, 195, 995, 195];
       obstacleSpeed = 400;
@@ -109,7 +111,6 @@ export const init = async () => {
       if (rotationOfBird <= 0.3) {
         setTimeout(() => {
           rotationOfBird += 0.04;
-          // console.log(rotationOfBird);
         }, 50);
       }
 
@@ -159,6 +160,7 @@ export const init = async () => {
   function randomHeightOfObstacle() {
     if (obstaclePosition[0] >= 600) {
       let optionOfObstacle1 = getRandomInt(1, 5);
+      score += 1;
       switch (optionOfObstacle1) {
         case 1:
           heightObstacleDown1 = 150;
@@ -184,11 +186,11 @@ export const init = async () => {
         default:
           break;
       }
-      console.log("1: " + heightObstacleUp1);
     }
 
     if (obstaclePosition[2] >= 600) {
       let optionOfObstacle2 = getRandomInt(1, 5);
+      score += 1;
       switch (optionOfObstacle2) {
         case 1:
           heightObstacleDown2 = 150;
@@ -214,7 +216,6 @@ export const init = async () => {
         default:
           break;
       }
-      console.log("2: " + heightObstacleUp2);
     }
   }
   function getRandomInt(min: number, max: number) {
@@ -353,7 +354,7 @@ export const init = async () => {
     }
 
     if (Math.abs(characterPosition.x - obstaclePosition[2]) <= 95) {
-      if (characterPosition.y - 90 - heightObstacleDown1 <= 90) {
+      if (characterPosition.y - 90 - heightObstacleDown2 <= 90) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
@@ -391,12 +392,12 @@ export const init = async () => {
         characterPosition.y -= gravityGame * delta;
       }
       font.draw(batch, "TAP TO TRY AGAIN", 150, 500, 400);
+      font.draw(batch, "Your Score is: " + score, 170, 450, 400);
       if (rotationOfBird >= -1.2) {
         rotationOfBird -= 0.1 - delta;
       }
 
       tryagainmode = true;
-      console.log(tryagainmode);
     }
     batch.end();
   });
