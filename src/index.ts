@@ -93,16 +93,17 @@ export const init = async () => {
       score = 0;
 
       obstaclePosition = [495, 195, 995, 195];
-      obstacleSpeed = 400;
+      obstacleSpeed = 350;
       heightObstacleUp1 = 300;
       heightObstacleDown1 = 270;
       heightObstacleUp2 = 200;
       heightObstacleDown2 = 420;
 
+      runningGame = true;
       firstClick = false;
       falling = true;
-      runningGame = true;
     }
+    tryagainmode = false;
   });
 
   function moveOfBird(delta: number) {
@@ -396,9 +397,11 @@ export const init = async () => {
       if (rotationOfBird >= -1.2) {
         rotationOfBird -= 0.1 - delta;
       }
-
-      tryagainmode = true;
+      setTimeout(() => {
+        tryagainmode = true;
+      }, 800);
     }
+    console.log(runningGame, tryagainmode);
     batch.end();
   });
 };
