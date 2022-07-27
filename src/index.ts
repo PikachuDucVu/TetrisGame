@@ -172,16 +172,16 @@ export const init = async () => {
       switch (optionOfObstacle1) {
         case 1:
           heightObstacleDown1 = 150;
-          heightObstacleUp1 = 450; //
+          heightObstacleUp1 = 400; //
           break;
 
         case 2:
           heightObstacleDown1 = 250;
-          heightObstacleUp1 = 350;
+          heightObstacleUp1 = 300;
           break;
         case 3:
           heightObstacleDown1 = 350;
-          heightObstacleUp1 = 250;
+          heightObstacleUp1 = 200;
           break;
         case 4:
           heightObstacleDown1 = 450;
@@ -194,6 +194,7 @@ export const init = async () => {
         default:
           break;
       }
+      console.log("1: " + heightObstacleUp1);
     }
 
     if (obstaclePosition[2] >= 600) {
@@ -201,16 +202,16 @@ export const init = async () => {
       switch (optionOfObstacle2) {
         case 1:
           heightObstacleDown2 = 150;
-          heightObstacleUp2 = 450;
+          heightObstacleUp2 = 400;
           break;
 
         case 2:
           heightObstacleDown2 = 250;
-          heightObstacleUp2 = 350;
+          heightObstacleUp2 = 300;
           break;
         case 3:
           heightObstacleDown2 = 350;
-          heightObstacleUp2 = 250;
+          heightObstacleUp2 = 200;
           break;
         case 4:
           heightObstacleDown2 = 450;
@@ -223,6 +224,7 @@ export const init = async () => {
         default:
           break;
       }
+      console.log("2: " + heightObstacleUp2);
     }
   }
   function getRandomInt(min: number, max: number) {
@@ -338,27 +340,22 @@ export const init = async () => {
         firstClick = false;
         speedY = 0;
       }
-      if (heightObstacleUp1 === 450 && characterPosition.y >= 510) {
+      if (heightObstacleUp1 === 400 && characterPosition.y >= 560) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
-      }
-      if (heightObstacleUp1 === 350 && characterPosition.y >= 610) {
+      } //
+      if (heightObstacleUp1 === 200 && characterPosition.y >= 760) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
-      }
-      if (heightObstacleUp1 === 250 && characterPosition.y >= 660) {
-        runningGame = false;
-        firstClick = false;
-        speedY = 0;
-      }
+      } //
       if (heightObstacleUp1 === 150 && characterPosition.y >= 810) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
       }
-      if (heightObstacleUp1 === 125 && characterPosition.y >= 830) {
+      if (heightObstacleUp1 === 125 && characterPosition.y >= 835) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
@@ -366,7 +363,13 @@ export const init = async () => {
     }
 
     if (Math.abs(characterPosition.x - obstaclePosition[2]) <= 90) {
-      if (characterPosition.y - 90 - heightObstacleDown2 <= 90) {
+      if (characterPosition.y - 90 - heightObstacleDown1 <= 90) {
+        runningGame = false;
+        firstClick = false;
+        speedY = 0;
+      }
+      // crash with obstacleUp
+      if (heightObstacleUp2 === 300 && characterPosition.y >= 660) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
@@ -376,22 +379,17 @@ export const init = async () => {
         firstClick = false;
         speedY = 0;
       }
-      if (heightObstacleUp2 === 500 && characterPosition.y >= 460) {
-        runningGame = false;
-        firstClick = false;
-        speedY = 0;
-      }
       if (heightObstacleUp2 === 400 && characterPosition.y >= 560) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
       }
-      if (heightObstacleUp2 === 300 && characterPosition.y >= 660) {
+      if (heightObstacleUp2 === 200 && characterPosition.y >= 760) {
         runningGame = false;
         firstClick = false;
-        speedY = 0; // correct
+        speedY = 0;
       }
-      if (heightObstacleUp2 === 250 && characterPosition.y >= 760) {
+      if (heightObstacleUp2 === 150 && characterPosition.y >= 810) {
         runningGame = false;
         firstClick = false;
         speedY = 0;
