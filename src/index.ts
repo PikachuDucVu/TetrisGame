@@ -14,7 +14,7 @@ import {
   PlayMode,
 } from "gdxts";
 
-export const init = async () => {
+export const FlappyBird = async () => {
   const stage = createStage();
   const canvas = stage.getCanvas();
   const viewport = createViewport(canvas, 600, 1000);
@@ -407,4 +407,4 @@ export const init = async () => {
   });
 };
 
-init();
+FlappyBird();
