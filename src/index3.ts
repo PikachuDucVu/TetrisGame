@@ -1,16 +1,14 @@
-import { cp } from "fs";
 import {
   createGameLoop,
   createStage,
   createViewport,
   PolygonBatch,
-  ShapeRenderer,
   Texture,
-  Vector2,
   BitmapFont,
   TextureRegion,
   Color,
 } from "gdxts";
+import { text } from "stream/consumers";
 
 const ROWS = 24;
 const COLS = 12;
@@ -22,7 +20,7 @@ export const init3 = async () => {
   const canvas = stage.getCanvas();
   const viewport = createViewport(canvas, GAME_WIDTH, GAME_HEIGHT);
   const gl = viewport.getContext();
-
+  const font = await BitmapFont.load(gl, "./1231231.fnt");
   const batch = new PolygonBatch(gl);
   const camera = viewport.getCamera();
   batch.setYDown(true);
@@ -31,10 +29,12 @@ export const init3 = async () => {
   const bgRight = await Texture.load(gl, "./bg1.png");
   const block = await Texture.load(gl, "./borderBlock.png");
   const mainBlock = await Texture.load(gl, "./GreenBlock.png");
+  const gameOverIcon = await Texture.load(gl, "./gameover.png");
   const SQUARE_SIZE = 83;
 
-  let delayTime = 0;
-  let gameOver = false;
+  let dropTime = 0;
+  let score = 0;
+  let gameover = false;
 
   //tetrominoes
   //I
@@ -103,8 +103,10 @@ export const init3 = async () => {
 
   // Square
   const sBlock = [
-    [1, 1],
-    [1, 1],
+    [
+      [1, 1],
+      [1, 1],
+    ],
   ];
 
   // Z
@@ -158,17 +160,17 @@ export const init3 = async () => {
       [0, 1, 0],
     ],
   ];
-  // console.log(iBlock[0]);
-
+  let speedGame = 0.5;
   class Piece {
     tetromino: any;
     color: any;
     tetrominoN: any;
     activeTetromino: any;
+    temp: any;
     x: number;
     y: number;
 
-    constructor(tetromino: any) {
+    constructor(tetromino: any, nextTetro?: any) {
       this.tetromino = tetromino;
       this.tetrominoN = 0;
       this.activeTetromino = this.tetromino[this.tetrominoN];
@@ -182,11 +184,6 @@ export const init3 = async () => {
         for (let col = 0; col < this.activeTetromino.length; col++) {
           if (this.activeTetromino[row][col]) {
             drawSquare(this.x + col, this.y + row, color);
-            //   if (color === 1) {
-            //     map[row + this.y][col + this.x] = 1;
-            //   } else {
-            //     map[row - this.y][col + this.x] = 0;
-            //   }
           }
         }
       }
@@ -206,14 +203,19 @@ export const init3 = async () => {
             continue;
           }
           map[this.y + row][this.x + col] = 1;
+          //checkGameOver
+          if (this.y + row < 1) {
+            gameover = true;
+          }
         }
         // console.warn(map);
       }
+
       //checkpoint
       for (let row = 0; row < ROWS; row++) {
         let fullRow: boolean = true;
         for (let col = 0; col < COLS; col++) {
-          fullRow = fullRow && map[row][col] != 0;
+          fullRow = fullRow && map[row][col] !== 0;
         }
         if (fullRow) {
           for (let y = row; y > 1; y--) {
@@ -224,8 +226,14 @@ export const init3 = async () => {
           for (let col = 0; col < COLS; col++) {
             map[0][col] = 0;
           }
+          if (speedGame > 0.15) {
+            speedGame -= 0.04;
+            console.log(speedGame);
+          }
         }
       }
+
+      score += 10;
     }
 
     collision(x: any, y: any, piece: any) {
@@ -251,6 +259,7 @@ export const init3 = async () => {
       }
       return false;
     }
+
     rotate() {
       let nextRotateOfBlock =
         this.tetromino[this.tetrominoN + 1] % this.tetromino.length;
@@ -273,19 +282,19 @@ export const init3 = async () => {
 
     moveDown() {
       if (this.y >= 22) {
-        piece = new Piece(blocks[getRandomInt(0, 6)]);
         this.lock();
+        piece = new Piece(nextPiece);
+        nextPiece = blocks[getRandomInt(0, 6)];
       }
       if (!this.collision(0, 1, this.activeTetromino)) {
         this.undraw();
         this.y++;
         this.draw();
       } else {
-        piece = new Piece(blocks[getRandomInt(0, 6)]);
         this.lock();
+        piece = new Piece(nextPiece);
+        nextPiece = blocks[getRandomInt(0, 6)];
       }
-
-      // console.log(this.x, this.y);
     }
     moveLeft() {
       if (!this.collision(-1, 0, this.activeTetromino)) {
@@ -301,19 +310,29 @@ export const init3 = async () => {
         this.draw();
       }
     }
+    showNextTetromino(nextTetro: any) {
+      for (let row = 0; row < nextTetro.length; row++) {
+        for (let col = 0; col < nextTetro[row].length; col++) {
+          if (nextTetro[row][col]) {
+            drawSquare(13.4 + col, 3.2 + row, 1);
+          }
+        }
+      }
+    }
   }
 
   let blocks = [
     iBlock,
     lBlock,
     lReverseBlock,
+    tBlock,
     sBlock,
     zBlock,
     zReverseBlock,
-    tBlock,
   ];
 
-  let piece = new Piece(blocks[1]);
+  let piece = new Piece(blocks[4]);
+  let nextPiece = blocks[getRandomInt(0, 6)];
 
   window.addEventListener("keydown", function (e) {
     control(e);
@@ -350,7 +369,6 @@ export const init3 = async () => {
       }
     }
   }
-  // console.log(map);
   function drawSquare(x: number, y: number, color?: any) {
     batch.begin();
     batch.draw(
@@ -366,18 +384,30 @@ export const init3 = async () => {
   createGameLoop((delta: number) => {
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    delayTime += delta;
-    drawMapGame();
-    console.log(map);
-    piece.fill(1);
-    if (delayTime >= 0.5) {
-      delayTime = 0;
-      piece.moveDown();
-    }
-    //draw border
     batch.setProjection(camera.projectionView.values);
+    drawMapGame();
     batch.begin();
     batch.draw(bgRight, 1000, 0, 500, 2000);
     batch.end();
+    piece.fill(1);
+    piece.showNextTetromino(nextPiece[0]);
+    if (!gameover) {
+      dropTime += delta;
+      if (dropTime >= speedGame) {
+        dropTime = 0;
+        piece.moveDown();
+      }
+    } else {
+      batch.begin();
+
+      batch.draw(
+        gameOverIcon,
+        GAME_WIDTH / 2 - 760,
+        GAME_HEIGHT / 2 - 500,
+        1000,
+        1000
+      );
+      batch.end();
+    }
   });
 };
