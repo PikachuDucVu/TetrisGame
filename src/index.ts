@@ -5,6 +5,8 @@ import {
   PolygonBatch,
   Texture,
   BitmapFont,
+  BitmapFontData,
+  Color,
 } from "gdxts";
 
 const ROWS = 24;
@@ -17,7 +19,12 @@ export const init = async () => {
   const canvas = stage.getCanvas();
   const viewport = createViewport(canvas, GAME_WIDTH, GAME_HEIGHT);
   const gl = viewport.getContext();
-  const font = await BitmapFont.load(gl, "./1231231.fnt");
+
+  const data = new BitmapFontData("./1231231.fnt", true);
+  await data.loadFont(gl);
+  data.setScale(3, 3);
+  const font = new BitmapFont(data, data.regions, true);
+
   const batch = new PolygonBatch(gl);
   const camera = viewport.getCamera();
   batch.setYDown(true);
@@ -27,6 +34,7 @@ export const init = async () => {
   const block = await Texture.load(gl, "./borderBlock.png");
   const mainBlock = await Texture.load(gl, "./GreenBlock.png");
   const gameOverIcon = await Texture.load(gl, "./gameover.png");
+  const temp = await Texture.load(gl, "./temp.png");
   const SQUARE_SIZE = 83;
 
   let dropTime = 0;
@@ -209,28 +217,28 @@ export const init = async () => {
       }
 
       //checkpoint
-      for (let row = 0; row < ROWS; row++) {
-        let fullRow: boolean = true;
-        for (let col = 0; col < COLS; col++) {
-          fullRow = fullRow && map[row][col] !== 0;
-        }
-        if (fullRow) {
-          for (let y = row; y > 1; y--) {
+      setTimeout(() => {
+        for (let row = 0; row < ROWS; row++) {
+          let fullRow: boolean = true;
+          for (let col = 0; col < COLS; col++) {
+            fullRow = fullRow && map[row][col] !== 0;
+          }
+          if (fullRow) {
+            for (let y = row; y > 1; y--) {
+              for (let col = 0; col < COLS; col++) {
+                map[y][col] = map[y - 1][col];
+              }
+            }
             for (let col = 0; col < COLS; col++) {
-              map[y][col] = map[y - 1][col];
+              map[0][col] = 0;
+            }
+            if (speedGame > 0.15) {
+              speedGame -= 0.05;
+              score += 10;
             }
           }
-          for (let col = 0; col < COLS; col++) {
-            map[0][col] = 0;
-          }
-          if (speedGame > 0.15) {
-            speedGame -= 0.04;
-            console.log(speedGame);
-          }
         }
-      }
-
-      score += 10;
+      }, 200);
     }
 
     collision(x: any, y: any, piece: any) {
@@ -333,6 +341,7 @@ export const init = async () => {
 
   window.addEventListener("keydown", function (e) {
     control(e);
+    console.log(e.code);
   });
   function control(e: any) {
     if (e.keyCode === 37) {
@@ -385,6 +394,16 @@ export const init = async () => {
     drawMapGame();
     batch.begin();
     batch.draw(bgRight, 1000, 0, 500, 2000);
+
+    batch.setColor(Color.WHITE);
+    font.draw(
+      batch,
+      "Score: " + score,
+      GAME_WIDTH / 2 + 320,
+      GAME_HEIGHT / 2 - 200,
+      GAME_WIDTH
+    );
+    batch.draw(temp, GAME_WIDTH / 2 + 200, GAME_HEIGHT / 2 - 500, 500, 250);
     batch.end();
     piece.fill(1);
     piece.showNextTetromino(nextPiece[0]);
@@ -404,6 +423,7 @@ export const init = async () => {
         1000,
         1000
       );
+
       batch.end();
     }
   });
