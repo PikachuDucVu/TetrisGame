@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/TetrisGame/static/js/main.26acd4a3.js",
+    "index.html": "/TetrisGame/index.html",
+    "main.26acd4a3.js.map": "/TetrisGame/static/js/main.26acd4a3.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.26acd4a3.js"
+  ]
+}
