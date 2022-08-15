@@ -1,3 +1,4 @@
+import { cp } from "fs";
 import {
   createGameLoop,
   createStage,
@@ -30,7 +31,6 @@ export const init3 = async () => {
   const bgRight = await Texture.load(gl, "./bg1.png");
   const block = await Texture.load(gl, "./borderBlock.png");
   const mainBlock = await Texture.load(gl, "./GreenBlock.png");
-  // const black = await Texture.load(gl, "./download.jpg");
   const SQUARE_SIZE = 83;
 
   let delayTime = 0;
@@ -182,13 +182,11 @@ export const init3 = async () => {
         for (let col = 0; col < this.activeTetromino.length; col++) {
           if (this.activeTetromino[row][col]) {
             drawSquare(this.x + col, this.y + row, color);
-            // if (color === 1) {
-            //   map[row + this.y][col + this.x] = 1;
-            //   console.log(map);
-            // } else {
-            //   map[row + this.y][col + this.x] = 0;
-            // }
-            // console.log(row + this.y);
+            //   if (color === 1) {
+            //     map[row + this.y][col + this.x] = 1;
+            //   } else {
+            //     map[row - this.y][col + this.x] = 0;
+            //   }
           }
         }
       }
@@ -209,7 +207,24 @@ export const init3 = async () => {
           }
           map[this.y + row][this.x + col] = 1;
         }
-        console.warn(map);
+        // console.warn(map);
+      }
+      //checkpoint
+      for (let row = 0; row < ROWS; row++) {
+        let fullRow: boolean = true;
+        for (let col = 0; col < COLS; col++) {
+          fullRow = fullRow && map[row][col] != 0;
+        }
+        if (fullRow) {
+          for (let y = row; y > 1; y--) {
+            for (let col = 0; col < COLS; col++) {
+              map[y][col] = map[y - 1][col];
+            }
+          }
+          for (let col = 0; col < COLS; col++) {
+            map[0][col] = 0;
+          }
+        }
       }
     }
 
@@ -270,7 +285,7 @@ export const init3 = async () => {
         this.lock();
       }
 
-      console.log(this.x, this.y);
+      // console.log(this.x, this.y);
     }
     moveLeft() {
       if (!this.collision(-1, 0, this.activeTetromino)) {
@@ -335,11 +350,11 @@ export const init3 = async () => {
       }
     }
   }
-  console.log(map);
+  // console.log(map);
   function drawSquare(x: number, y: number, color?: any) {
     batch.begin();
     batch.draw(
-      color ? mainBlock : block, // 0 = grayBlock // 1 = greenBlock
+      color ? mainBlock : block, // 0 = gray // 1 = green
       SQUARE_SIZE * x,
       SQUARE_SIZE * y,
       SQUARE_SIZE,
@@ -351,19 +366,18 @@ export const init3 = async () => {
   createGameLoop((delta: number) => {
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    drawMapGame();
-    piece.fill(1);
-
-    //draw border
-    batch.setProjection(camera.projectionView.values);
-    batch.begin();
-    // batch.draw(black, 0, 0, GAME_WIDTH, GAME_HEIGHT);
-    batch.draw(bgRight, 1000, 0, 500, 2000);
-    batch.end();
     delayTime += delta;
+    drawMapGame();
+    console.log(map);
+    piece.fill(1);
     if (delayTime >= 0.5) {
       delayTime = 0;
       piece.moveDown();
     }
+    //draw border
+    batch.setProjection(camera.projectionView.values);
+    batch.begin();
+    batch.draw(bgRight, 1000, 0, 500, 2000);
+    batch.end();
   });
 };
