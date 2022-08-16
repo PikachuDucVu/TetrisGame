@@ -286,7 +286,7 @@ export const init = async () => {
     }
 
     moveDown() {
-      if (this.y >= 22) {
+      if (this.y > ROWS - 1) {
         this.lock();
         piece = new Piece(nextPiece);
         nextPiece = blocks[getRandomInt(0, 6)];
