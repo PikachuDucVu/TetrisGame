@@ -234,8 +234,8 @@ export const init = async () => {
             }
             if (speedGame > 0.15) {
               speedGame -= 0.05;
-              score += 10;
             }
+            score += 10;
           }
         }
       }, 200);
@@ -341,7 +341,6 @@ export const init = async () => {
 
   window.addEventListener("keydown", function (e) {
     control(e);
-    console.log(e.code);
   });
   function control(e: any) {
     if (e.keyCode === 37) {
