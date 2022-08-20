@@ -289,7 +289,7 @@ export const init = async () => {
       if (this.y > ROWS - 1) {
         this.lock();
         piece = new Piece(nextPiece);
-        nextPiece = blocks[getRandomInt(0, 6)];
+        nextPiece = blocks[getRandomInt(0, 7)];
       }
       if (!this.collision(0, 1, this.activeTetromino)) {
         this.undraw();
@@ -298,7 +298,7 @@ export const init = async () => {
       } else {
         this.lock();
         piece = new Piece(nextPiece);
-        nextPiece = blocks[getRandomInt(0, 6)];
+        nextPiece = blocks[getRandomInt(0, 7)];
       }
     }
     moveLeft() {
@@ -337,11 +337,21 @@ export const init = async () => {
   ];
 
   let piece = new Piece(blocks[4]);
-  let nextPiece = blocks[getRandomInt(0, 6)];
+  let nextPiece = blocks[getRandomInt(0, 7)];
 
   window.addEventListener("keydown", function (e) {
     control(e);
+    if (gameover === true) {
+      speedGame = 0.5;
+      score = 0;
+      setTimeout(() => {
+        mapStart();
+        drawMapGame();
+        gameover = false;
+      }, 300);
+    }
   });
+
   function control(e: any) {
     if (e.keyCode === 37) {
       piece.moveLeft();
@@ -360,13 +370,17 @@ export const init = async () => {
   }
 
   let map: any[] = [];
-  for (let row = 0; row < ROWS; row++) {
-    map[row] = [];
-    for (let col = 0; col < COLS; col++) {
-      drawSquare(col, row, 0);
-      map[row][col] = 0;
+  function mapStart() {
+    for (let row = 0; row < ROWS; row++) {
+      map[row] = [];
+      for (let col = 0; col < COLS; col++) {
+        drawSquare(col, row, 0);
+        map[row][col] = 0;
+      }
     }
   }
+  mapStart();
+
   function drawMapGame() {
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
@@ -399,10 +413,10 @@ export const init = async () => {
       batch,
       "Score: " + score,
       GAME_WIDTH / 2 + 320,
-      GAME_HEIGHT / 2 - 200,
+      GAME_HEIGHT / 2 + 500,
       GAME_WIDTH
     );
-    batch.draw(temp, GAME_WIDTH / 2 + 200, GAME_HEIGHT / 2 - 500, 500, 250);
+    batch.draw(temp, GAME_WIDTH / 2 + 150, GAME_HEIGHT / 2 - 500, 500, 250);
     batch.end();
     piece.fill(1);
     piece.showNextTetromino(nextPiece[0]);
